@@ -1,6 +1,7 @@
 const path = require('path');
 // TODO add clean webpack plugin: so Delete dist folder before build(delete source maps)
 const config = {
+    target: 'node',
     entry: './src/index.ts',
     mode: "production",
     module: {

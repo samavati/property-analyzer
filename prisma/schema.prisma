@@ -1,0 +1,29 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Property {
+  id    String  @id @unique
+  url String
+  title String?
+  date  String?
+  district String?
+  space Float?
+  rooms Int?
+  parking Boolean?
+  warehouse Boolean?
+  elevator Boolean?
+  age Int?
+  pricePerMeter Float?
+  floor Int?
+  total_floors Int?
+  description_raw String? @db.LongText
+}
