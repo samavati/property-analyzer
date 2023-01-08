@@ -1,6 +1,5 @@
 import { PrismaClient } from "@prisma/client";
 import { SingleBar, Presets } from "cli-progress";
-import { Spinner } from "cli-spinner";
 import colors from "colors/safe";
 import { Queue } from "@samavati/tsds";
 import { Crawler } from "../Crawler";
@@ -23,7 +22,7 @@ export class Recorder {
   }
 
   private async _init() {
-    const seen = await prisma.property.findMany();
+    const seen = await prisma.car.findMany();
     for (const item of seen) {
       this._setSeen(item.id);
     }
@@ -32,14 +31,15 @@ export class Recorder {
   private async getAllPages(pages: number) {
     console.log(colors.green("crawling all pages ..."));
     this._progressBar.start(pages, 0);
+    const now = Date.now();
     for (let i = 1; i < pages + 1; i++) {
-      const items = await this._crawler.extractItems(i);
+      const items = await this._crawler.extractItems(i, now);
 
       for (const item of items) {
         this.items.enqueue(item);
       }
       this._progressBar.update(i);
-      await sleep(3000);
+      await sleep(5000);
     }
     this._progressBar.stop();
   }
@@ -55,7 +55,7 @@ export class Recorder {
       if (!this._hasSeen(item.id)) {
         try {
           const detail = await this._crawler.extractItem(item.url);
-          await prisma.property.create({
+          await prisma.car.create({
             data: {
               id: item.id,
               url: item.url,
@@ -63,12 +63,13 @@ export class Recorder {
             },
           });
         } catch (error) {
+          console.log(error)
           continue;
         }
 
         this._setSeen(item.id);
         this._progressBar.update(total - this.items.length);
-        await sleep(3000);
+        await sleep(5000);
       }
     }
     this._progressBar.stop();

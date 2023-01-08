@@ -1,10 +1,8 @@
-import { load, CheerioAPI } from "cheerio";
+import { AbstractParser } from "./AbstractParser";
 
-export class Parser {
-  private $: CheerioAPI;
-
+export class BuildingParser extends AbstractParser {
   constructor(html: string) {
-    this.$ = load(html);
+    super(html);
   }
 
   private _mapBooleanValues(value: string) {
@@ -14,23 +12,8 @@ export class Parser {
     return false;
   }
 
-  private _mapIntValue(int: number) {
-    if (isNaN(int) || !int) {
-      return null;
-    }
-    return int;
-  }
-
   private _getTitle() {
     return this.$("section#item-details h1").first().text();
-  }
-
-  private _getDate() {
-    const attr = this.$("section#item-details time").first().attr();
-    if (attr) {
-      return attr["datetime"];
-    }
-    return null;
   }
 
   private _getDistrict() {
@@ -38,50 +21,42 @@ export class Parser {
   }
 
   private _getSpace() {
-    return this._mapIntValue(
-      +this.$('th:contains("متراژ") + td').first().text().trim()
-    );
+    const space = this._getTableItem("متراژ");
+    return this._mapIntValue(this._stringToNumber(space));
   }
 
   private _getRooms() {
-    return this._mapIntValue(
-      +this.$('th:contains("تعداد اتاق") + td').first().text().trim()
-    );
+    const rooms = this._getTableItem("تعداد اتاق");
+    return this._mapIntValue(this._stringToNumber(rooms));
   }
 
   private _getParking() {
-    const parking = this.$('th:contains("پارکینگ") + td').first().text().trim();
+    const parking = this._getTableItem("پارکینگ");
     return this._mapBooleanValues(parking);
   }
 
   private _getWarehouse() {
-    const warehouse = this.$('th:contains("انباری") + td')
-      .first()
-      .text()
-      .trim();
+    const warehouse = this._getTableItem("انباری");
     return this._mapBooleanValues(warehouse);
   }
 
   private _getElevator() {
-    const value = this.$('th:contains("آسانسور") + td').first().text().trim();
+    const value = this._getTableItem("آسانسور");
     return this._mapBooleanValues(value);
   }
 
   private _getAge() {
-    const age = this.$('th:contains("سن بنا") + td').first().text().trim();
+    const age = this._getTableItem("سن بنا");
     if (age === "نوساز") {
       return 0;
     }
-    return this._mapIntValue(+age.replace(" سال", ""));
+    const ageNumber = age.replace(" سال", "");
+    return this._mapIntValue(this._stringToNumber(ageNumber));
   }
 
   private _getPricePerMeter() {
-    return +this.$('th:contains("قیمت هر متر") + td')
-      .first()
-      .text()
-      .trim()
-      .split(",")
-      .join("");
+    const price = this._getTableItem("قیمت هر متر").split(",").join("");
+    return this._mapIntValue(this._stringToNumber(price));
   }
 
   private _parseDescription() {
@@ -100,12 +75,12 @@ export class Parser {
 
   private _getFloor() {
     const value = this._parseDescription()["طبقه ملک"];
-    return this._mapIntValue(+value);
+    return this._mapIntValue(this._stringToNumber(value));
   }
 
   private _getTotalFloors() {
     const value = this._parseDescription()["تعداد طبقات"];
-    return this._mapIntValue(+value);
+    return this._mapIntValue(this._stringToNumber(value));
   }
 
   getSingleItem() {
@@ -124,13 +99,5 @@ export class Parser {
       total_floors: this._getTotalFloors(),
       description_raw: this._parseDescription()["raw"],
     };
-  }
-
-  getItems() {
-    const articles = this.$("article.serp-item.list").get();
-    return articles.map((article) => ({
-      url: article.attribs["data-href"],
-      id: article.attribs["id"].split("-")[1],
-    }));
   }
 }

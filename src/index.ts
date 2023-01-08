@@ -1,13 +1,14 @@
 import { PrismaClient } from "@prisma/client";
 import { Crawler } from "./Crawler";
 import { Recorder } from "./Recorder";
+import { BASE_URL } from "./constants";
 
 const prisma = new PrismaClient();
 
 async function main() {
-  const crawler = new Crawler();
+  const crawler = new Crawler(BASE_URL);
   const recorder = new Recorder(crawler);
-  await recorder.start(3);
+  await recorder.start(2);
 }
 
 main()

@@ -25,7 +25,6 @@
     "@babel/plugin-transform-runtime": "^7.12.10",
     "@babel/preset-env": "^7.12.11",
     "@types/cli-progress": "^3.11.0",
-    "@types/cli-spinner": "^0.2.1",
     "@types/node": "^14.18.35",
     "babel-loader": "^8.2.2",
     "prisma": "^4.7.1",
@@ -42,7 +41,7 @@
     "axios-retry": "^3.3.1",
     "cheerio": "^1.0.0-rc.12",
     "cli-progress": "^3.11.2",
-    "cli-spinner": "^0.2.10",
-    "colors": "^1.4.0"
+    "colors": "^1.4.0",
+    "persian-number": "^1.5.1"
   }
 }

@@ -10,8 +10,28 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Property {
-  id    String  @id @unique
+model Car {
+  id String  @id @unique
+  url String
+  title String?
+  price Float?
+  date DateTime? @db.Timestamp(3)
+  neighborhood String?
+  paymentType String?
+  brand String?
+  chassis String?
+  productionYear Int?
+  mileage Float?
+  type String?
+  color String?
+  gearboxType String?
+  bodyStatus String?
+  fuelType String?
+  description_raw String? @db.LongText
+}
+
+model Building {
+  id String  @id @unique
   url String
   title String?
   date  String?
